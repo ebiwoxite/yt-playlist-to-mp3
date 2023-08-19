@@ -42,4 +42,3 @@ for file in *; do
 done
 echo "Finished renaming and tagging files"
 echo "You can find all your awesome music in $directory"
-echo "You can find all your awesome music in $directory"
