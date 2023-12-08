@@ -1,13 +1,54 @@
 #!/usr/bin/bash
 
-directory="/youneedtochangethis"
-cd $directory
-rm *
-echo "removed all files in $directory"
-playlist=$1
-yt-dlp -f 'ba' -x --audio-format mp3 $1 -o '%(uploader)sµ%(artist)sµ%(title)s.mp3'
+singlefile="false"
+while getopts ":d:su:" opt; do
+    case $opt in
+        d)
+            directory="$OPTARG"
+            echo "Directory: $directory"
+            ;;
+        s)
+            singlefile="true"
+            echo "Single file: $singlefile"
+            ;;
+    
+        u)
+            url="$OPTARG"
+            echo "Playlist url: $url"
+            ;;
+    
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+   
+    esac
+done
 
-for file in *; do
+# Check if option 'url' is provided
+if [ -z "$url" ]; then
+    echo "Option '-u' is required. Please provide a valid youtube playlist url"
+    exit 1
+fi
+
+# Check if directory exists
+if [ ! -d "$directory" ]; then
+    echo "Directory '$directory' does not exist. Please provide a valid directory path."
+    exit 1
+fi
+
+# Check if option 'singlefile' is provided
+if $singlefile; then
+    cd $directory
+    yt-dlp -f 'ba' -x --audio-format mp3 $url -o '%(title)s.mp3' --concat-playlist 'always'
+    exit 1
+fi
+
+cd $directory
+
+yt-dlp -f 'ba' -x --audio-format mp3 $url -o '%(uploader)sµ%(artist)sµ%(title)s.tmp'
+
+for file in *.tmp*; do
     #cleaning the name and applying tags (artist/title) to the file 
     newfile=$(echo "$file" | sed 's/ - Topic//')
  
@@ -15,13 +56,12 @@ for file in *; do
     newfile=$(echo "$newfile" | sed 's/ *(.*)//') 
     newfile=$(echo "$newfile" | sed 's/\[.*\]//')
 
-    basename="${newfile%%.mp3*}" #remove the .mp3
+    basename="${newfile%%.tmp*}" #remove the extension (.tmp.mp3)
     basename="${basename// - /µ}"
     IFS='µ'
     read -r uploader artist title <<< "$basename"
 
     if [[ $title == *"µ"* ]]; then
-        echo "title contains artist"
         read -r artist title <<< "$title"
     fi
     IFS=' '
