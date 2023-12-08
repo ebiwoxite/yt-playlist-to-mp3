@@ -22,9 +22,10 @@ There are 3 options:
     -u to specify the yt playlist url
     -s to specify the singlefile flag
 
-If the -s option is used, all the videos in the playlist will be concatenated into a single file (<playlistname.mp3>)
+If the -s option is used, all the videos in the playlist will be concatenated into a single file <playlistname.mp3>
 
-Else the name of the files will be <artist - title.mp3>
+Else the name of the files will be <artist - title.mp3>.
+
 I tried to make the final name/tags as clean as possible but if you encounter any problem I would be happy to know.
 
 
